@@ -1,0 +1,110 @@
+Version 2.0 Changelog
+Date: November 17, 2024
+
+1. Database Management Improvements:
+Database Backup System:
+
+Implemented an automatic backup mechanism allowing users to generate SQL dump files of the entire database.
+Backups are stored securely outside of the web root, preventing public access and ensuring that backup files are protected.
+The backup files are generated in a directory structure (/backups) for better organization.
+File download feature: Added functionality to download backups as .sql files directly from the web interface.
+Backup Restore Functionality:
+
+Introduced the option to restore the database from a previously generated backup file (.sql), ensuring seamless database recovery in case of failures or data loss.
+Users are able to select and upload .sql files to restore the database to the state it was in during the backup.
+Clear Table Data:
+
+Added functionality for database administrators to select multiple tables via checkboxes and clear their data (delete all records from selected tables).
+Implemented a reset for the auto-increment field to ensure that the primary key counters restart from 1 after data is cleared.
+Added confirmation dialogs before performing data clearing actions to avoid accidental data deletion.
+Custom SQL Query Execution:
+
+Created a tool for executing custom SQL queries directly from the web interface.
+Users can input SELECT, INSERT, UPDATE, or DELETE SQL commands, and the results (for SELECT) are displayed in a table format, while success or failure messages are shown for other operations.
+
+2. User Access Control and Security:
+Admin-Only Access:
+Restricted access to the database management functions so that only users with admin roles can execute critical operations (backup, restore, clearing data).
+Implemented access control checks to prevent unauthorized access to these sections.
+Secure File Management:
+Ensured that backup files are stored outside the web-accessible directory, providing additional security by protecting sensitive backup data from public view.
+Backup download links are secured to avoid unauthorized access.
+
+3. User Interface and Experience Enhancements:
+AdminLTE Integration:
+
+Integrated AdminLTE framework into the new database management tools for a professional, responsive, and user-friendly interface.
+Added styling for confirmation dialogs and notifications to improve usability during critical operations (e.g., backups, restores).
+Dynamic DataTables for Custom Queries:
+
+Used DataTables to dynamically display the results of custom SQL queries. This allows users to run queries like SELECT and view results in an interactive table with sorting and pagination.
+Users can edit or delete rows directly from the table for ease of management.
+Improved Table Data Management:
+
+Tables that allow users to clear data now show dynamic confirmation popups to reduce the risk of accidental deletions.
+Improved the UI for handling backups and restores, including progress indicators and feedback messages for a smoother user experience.
+
+4. Product & Order Management Enhancements:
+Product Management:
+
+Improved the product listing page by allowing users to add, edit, and delete products.
+Integrated product images directly into the product details page, allowing for visual previews.
+Enhanced the category dropdown in product management, allowing users to select categories dynamically from the categories table.
+Order Handling:
+
+Orders are now tightly integrated with delivery notes and invoices, ensuring consistency across all stages of the order lifecycle.
+Improvements made in handling product prices for orders, taking into account the margins and fixed pricing for clients with specific "devis" (quotations).
+Streamlined the process for creating and managing orders, including the ability to view order details and manage product quantities and prices.
+
+5. Devis (Quotation) Management Enhancements:
+Multiple Product Support in Devis:
+
+Enhanced the devis (quotation) management system to support multiple products within a single quote. Users can now add multiple products with individual prices, allowing more flexible quotations.
+Price Customization: Devis now fully supports custom pricing for each product, factoring in any discounts or specific client prices.
+Devis Status Integration:
+
+Integrated status handling for devis with options for "Brouillon" (draft), "Actif" (active), "Expiré" (expired), and "Annulé" (canceled), providing better workflow management.
+Display of statuses is visually represented using AdminLTE's badge classes (e.g., badge-success, badge-danger, etc.).
+Quotation View and Print:
+
+Developed the ability to view a detailed quotation (devis), which includes the full list of products, quantities, and prices.
+Added a print button to allow users to generate hard copies of the devis.
+
+6. Invoice Section Updates:
+Invoice View and Management:
+
+The invoice section was enhanced to allow viewing and managing invoices more efficiently.
+Improved the integration between orders, invoices, and delivery notes, ensuring that all related documents are properly linked.
+Invoice Handling:
+
+Continued improvements in invoice generation, ensuring that each invoice contains detailed product and pricing information pulled from order details.
+Integration of invoice statuses (e.g., Pending, Paid, Canceled) to reflect the current state of each invoice.
+Dynamic Invoice Summary:
+
+Introduced an invoice summary view that dynamically calculates the total amounts, taxes, and discounts for the products listed in each invoice.
+
+7. Status System Enhancements:
+Centralized Status Management:
+
+Refined the status management system, making it more unified across various sections like clients, products, devis, and orders.
+Used AdminLTE’s badge classes to visually represent status types in a consistent manner, making it easier to identify the state of a client, product, or order at a glance.
+Status Assignment:
+
+The ability to assign and change statuses for entities (clients, products, orders, devis) was streamlined and centralized, ensuring consistency in how statuses are handled and displayed across the system.
+
+8. General System Enhancements and Bug Fixes:
+File Management:
+
+Improved the logic for uploading and categorizing files like client logos and product images.
+Ensured that images are uploaded to the correct directories (/uploads/logos/ for client logos and /assets/avatars/ for user avatars).
+Optimization and Performance:
+
+Conducted database optimizations to improve performance when fetching and displaying large datasets.
+Improved SQL queries to ensure that table lookups and data manipulations are performed as efficiently as possible.
+Error Handling:
+
+Strengthened error handling, especially for critical operations like clearing table data, restoring backups, and executing custom SQL queries. Now the system provides clear and detailed feedback to the user when something goes wrong.
+Codebase Refactor:
+
+Refactored the codebase for better readability and maintainability, focusing on modularization and making the system easier to extend in the future.
+Ensured that all the new features integrate smoothly into the existing workflow.
