@@ -22,6 +22,21 @@ const MODES_PAIEMENT = [
 const MOIS_FR = [1 => 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet',
     'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 
+/**
+ * Logo du restaurant : le premier fichier trouvé parmi assets/logo.png, .jpg, .webp
+ * (votre logo officiel), sinon le logo par défaut assets/logo.svg.
+ */
+function app_logo(): string
+{
+    foreach (['png', 'jpg', 'jpeg', 'webp', 'svg'] as $ext) {
+        $f = __DIR__ . '/../assets/logo.' . $ext;
+        if (is_file($f)) {
+            return 'assets/logo.' . $ext . '?v=' . filemtime($f);
+        }
+    }
+    return '';
+}
+
 function e($s): string
 {
     return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8');

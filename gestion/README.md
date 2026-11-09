@@ -36,4 +36,11 @@ Bootstrap 5, Bootstrap Icons et Chart.js sont inclus dans `assets/vendor/` : auc
 - **Solde fournisseur** = total des achats − total des paiements.
 - Une avance est rattachée à un **mois de déduction** ; une fois le salaire de ce mois payé, l'avance est verrouillée.
 
+## Logo
+
+Le logo s'affiche dans le menu, l'onglet du navigateur et en tête des pages imprimées (relevés fournisseurs…).
+Pour mettre le logo officiel de Dune Rooftop, déposez simplement le fichier dans `gestion/assets/` sous le nom
+**`logo.png`** (ou `logo.jpg` / `logo.webp`) : il remplace automatiquement le logo par défaut `logo.svg`.
+Idéalement une image carrée d'au moins 256 × 256 px.
+
 Le nom (`APP_NAME`) et la devise (`DEVISE`, `DH`) se changent dans `inc/functions.php`.

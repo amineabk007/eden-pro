@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Dune Rooftop">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b1d3a"/>
+      <stop offset="1" stop-color="#8a3b3b"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd166"/>
+      <stop offset="1" stop-color="#f4845f"/>
+    </linearGradient>
+    <linearGradient id="dune1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9b872"/>
+      <stop offset="1" stop-color="#c98a4b"/>
+    </linearGradient>
+    <linearGradient id="dune2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d4954f"/>
+      <stop offset="1" stop-color="#a8692f"/>
+    </linearGradient>
+    <clipPath id="c"><rect x="2" y="2" width="60" height="60" rx="14"/></clipPath>
+  </defs>
+  <g clip-path="url(#c)">
+    <rect x="0" y="0" width="64" height="64" fill="url(#sky)"/>
+    <circle cx="32" cy="36" r="15" fill="url(#sun)"/>
+    <!-- toit-terrasse : rambarde -->
+    <g stroke="#ffe8c2" stroke-width="1.6" stroke-linecap="round" opacity=".9">
+      <line x1="8" y1="17" x2="56" y2="17"/>
+      <line x1="12" y1="17" x2="12" y2="23"/><line x1="20" y1="17" x2="20" y2="23"/>
+      <line x1="44" y1="17" x2="44" y2="23"/><line x1="52" y1="17" x2="52" y2="23"/>
+    </g>
+    <path d="M0 44 C14 34 26 36 38 43 S56 48 64 42 V64 H0 Z" fill="url(#dune1)"/>
+    <path d="M0 52 C12 46 22 47 32 52 S52 58 64 50 V64 H0 Z" fill="url(#dune2)"/>
+  </g>
+</svg>
