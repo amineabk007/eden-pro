@@ -9,8 +9,26 @@ if (getenv('GESTION_SQLITE')) {
     ]);
     $pdo->exec('PRAGMA foreign_keys = ON');
 } else {
-    // Base MySQL de l'application (config/config.php)
-    require __DIR__ . '/../../config/config.php';
+    // Base MySQL : identifiants dans gestion/config.php (copie de config.example.php)
+    $cfg = __DIR__ . '/../config.php';
+    if (!is_file($cfg)) {
+        http_response_code(500);
+        exit('<p style="font-family:sans-serif">Configuration manquante : copiez <b>config.example.php</b> en '
+            . '<b>config.php</b> et indiquez les identifiants de la base MySQL.</p>');
+    }
+    require $cfg;
+    try {
+        $pdo = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4', DB_USER, DB_PASS, [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]);
+    } catch (PDOException $e) {
+        error_log('Connexion MySQL impossible : ' . $e->getMessage());
+        http_response_code(500);
+        exit('<p style="font-family:sans-serif">Connexion à la base de données impossible. '
+            . 'Vérifiez DB_HOST, DB_NAME, DB_USER et DB_PASS dans config.php.</p>');
+    }
 }
 
 function gestion_install(PDO $pdo): void
@@ -140,11 +158,22 @@ function gestion_install(PDO $pdo): void
     foreach ($defaults as $d) {
         $st->execute($d);
     }
+    gestion_migrate($pdo);
 }
 
 /** Ajoute les colonnes apparues dans les versions récentes (installations existantes). */
 function gestion_migrate(PDO $pdo): void
 {
+    $sqlite = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite';
+    $pdo->exec('CREATE TABLE IF NOT EXISTS g_users (
+        id ' . ($sqlite ? 'INTEGER PRIMARY KEY AUTOINCREMENT' : 'INT AUTO_INCREMENT PRIMARY KEY') . ',
+        username VARCHAR(50) NOT NULL UNIQUE,
+        nom VARCHAR(100) NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        role VARCHAR(10) NOT NULL DEFAULT \'user\',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )' . ($sqlite ? '' : ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4'));
+
     $cols = [
         'g_ventes' => ['nb_couverts', 'INT NOT NULL DEFAULT 0'],
         'g_achats' => ['categorie', "VARCHAR(20) NOT NULL DEFAULT 'nourriture'"],

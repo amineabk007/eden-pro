@@ -15,6 +15,8 @@ $menu = [
     'salaires'     => ['bi-cash-stack', 'Salaires'],
     '#charges'     => 'Charges',
     'charges'      => ['bi-receipt', 'Charges fixes & variables'],
+    '#admin'       => 'Compte',
+    'utilisateurs' => ['bi-person-gear', is_admin() ? 'Utilisateurs' : 'Mon compte'],
 ];
 ?>
 <!DOCTYPE html>
@@ -65,10 +67,9 @@ $menu = [
             </ul>
             <hr>
             <div class="small">
-                <i class="bi bi-person-circle me-1"></i><?= e($_SESSION['username'] ?? 'Utilisateur') ?>
+                <i class="bi bi-person-circle me-1"></i><?= e($ME['nom'] ?: $ME['username']) ?>
                 <div class="mt-2">
-                    <a href="../dashboard.php" class="text-white-50 me-2"><i class="bi bi-arrow-left"></i> Eden</a>
-                    <a href="../logout.php" class="text-white-50"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
+                    <a href="logout.php" class="text-white-50"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
                 </div>
             </div>
         </div>

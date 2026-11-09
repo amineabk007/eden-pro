@@ -18,6 +18,10 @@ body { background: #f4f6f9; }
 .app-logo { width: 48px; height: 48px; object-fit: contain; border-radius: 12px; }
 .app-logo-sm { width: 30px; height: 30px; object-fit: contain; border-radius: 8px; }
 
+.auth-page { background: linear-gradient(160deg, #2b1d3a 0%, #8a3b3b 55%, #d4954f 100%); }
+.auth-card { width: 100%; max-width: 400px; }
+.auth-logo { width: 84px; height: 84px; object-fit: contain; border-radius: 20px; }
+
 /* Impression : en-tête avec le logo, sans menu ni formulaires */
 @media print {
     .sidebar, .navbar, form, .btn, .alert { display: none !important; }

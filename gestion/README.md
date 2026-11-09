@@ -1,6 +1,6 @@
 # Dune Rooftop — gestion du restaurant
 
-Application web (PHP / MySQL) en français pour le restaurant **Dune Rooftop**, intégrée à Eden : elle utilise la même base (`config/config.php`) et la même connexion (`login.php`).
+Application web (PHP / MySQL) en français pour le restaurant **Dune Rooftop**.
 
 ## Modules
 
@@ -18,23 +18,19 @@ Application web (PHP / MySQL) en français pour le restaurant **Dune Rooftop**, 
 
 ## Installation
 
-1. Copier le dossier `gestion/` dans le projet (déjà fait).
-2. Vérifier `config/config.php` (base `eden`).
-3. Se connecter à Eden puis ouvrir `http://votre-serveur/eden-pro/gestion/`.
+Application **autonome** : elle a sa propre connexion (comptes dans la table `g_users`) et sa propre configuration.
 
-Les tables (préfixe `g_`) sont créées automatiquement au premier accès. Le fichier `install.sql` permet aussi de les créer à la main (phpMyAdmin).
+1. Copier `config.example.php` en `config.php` et y mettre les identifiants MySQL.
+2. Ouvrir le site : les tables (préfixe `g_`) sont créées automatiquement, puis l'écran
+   **« Installation — compte administrateur »** permet de créer le premier compte.
+3. Les autres comptes se créent dans **Utilisateurs** (rôle Administrateur ou Utilisateur).
 
-Bootstrap 5, Bootstrap Icons et Chart.js sont inclus dans `assets/vendor/` : aucune connexion Internet n'est nécessaire.
+Mise en ligne sur Hostinger (`erp.dunerooftop.shop`) : voir **[DEPLOIEMENT.md](DEPLOIEMENT.md)**.
 
-## Calculs
+`install.sql` permet aussi de créer les tables à la main (phpMyAdmin). Le fichier `.htaccess` force le HTTPS
+et bloque l'accès à `inc/`, `config.php` et aux fichiers internes.
 
-- **Résultat estimé** = CA − achats − salaires bruts payés (base + primes − retenues) − charges.
-- **Flux de trésorerie** = CA encaissé − (paiements fournisseurs + salaires nets + avances versées + charges).
-- **Food cost** = achats nourriture / CA (objectif ≤ 35 %) ; **coût boissons** = achats boissons / CA (≤ 30 %).
-- **Masse salariale** = salaires bruts / CA (≤ 35 %) ; **prime cost** = (nourriture + boissons + salaires) / CA (≤ 65 %).
-- **Ticket moyen** = CA des jours où les couverts sont saisis / nombre de couverts.
-- **Solde fournisseur** = total des achats − total des paiements.
-- Une avance est rattachée à un **mois de déduction** ; une fois le salaire de ce mois payé, l'avance est verrouillée.
+Bootstrap 5, Bootstrap Icons et Chart.js sont inclus dans `assets/vendor/` : aucune dépendance externe.
 
 ## Logo
 
