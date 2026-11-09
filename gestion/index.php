@@ -6,10 +6,17 @@ require __DIR__ . '/inc/bootstrap.php';
 $p = [$du, $au];
 
 // ---- Indicateurs de la période ----
-$ca = row('SELECT COALESCE(SUM(montant_especes),0) AS esp, COALESCE(SUM(montant_carte),0) AS cb FROM g_ventes WHERE date_vente BETWEEN ? AND ?', $p);
+$ca = row('SELECT COALESCE(SUM(montant_especes),0) AS esp, COALESCE(SUM(montant_carte),0) AS cb, COALESCE(SUM(nb_couverts),0) AS couv,
+                  COALESCE(SUM(CASE WHEN nb_couverts > 0 THEN montant_especes + montant_carte ELSE 0 END),0) AS ca_couv
+           FROM g_ventes WHERE date_vente BETWEEN ? AND ?', $p);
 $caTotal = $ca['esp'] + $ca['cb'];
+$ticketMoyen = $ca['couv'] > 0 ? $ca['ca_couv'] / $ca['couv'] : 0;
 
-$achats    = (float) scalar('SELECT COALESCE(SUM(montant),0) FROM g_achats WHERE date_achat BETWEEN ? AND ?', $p);
+$achatsCat = array_fill_keys(array_keys(CATEGORIES_ACHAT), 0.0);
+foreach (rows('SELECT categorie, SUM(montant) AS t FROM g_achats WHERE date_achat BETWEEN ? AND ? GROUP BY categorie', $p) as $r) {
+    $achatsCat[$r['categorie']] = (float) $r['t'];
+}
+$achats = array_sum($achatsCat);
 $paiements = (float) scalar('SELECT COALESCE(SUM(montant),0) FROM g_paiements_fournisseurs WHERE date_paiement BETWEEN ? AND ?', $p);
 $detteFour = (float) scalar('SELECT COALESCE(SUM(montant),0) FROM g_achats') - (float) scalar('SELECT COALESCE(SUM(montant),0) FROM g_paiements_fournisseurs');
 
@@ -28,6 +35,15 @@ $depenses = $achats + $sal['brut'] + $charges;
 $resultat = $caTotal - $depenses;
 $decaisse = $paiements + $sal['net'] + $avances + $charges;
 $tresorerie = $caTotal - $decaisse;
+
+// Ratios restaurant (en % du CA)
+$pct = fn($v) => $caTotal > 0 ? $v / $caTotal * 100 : null;
+$ratios = [
+    ['Food cost', $pct($achatsCat['nourriture']), 'Achats nourriture / CA', 35, 'bi-egg-fried'],
+    ['Coût boissons', $pct($achatsCat['boissons']), 'Achats boissons / CA', 30, 'bi-cup-straw'],
+    ['Masse salariale', $pct($sal['brut']), 'Salaires / CA', 35, 'bi-people'],
+    ['Prime cost', $pct($achatsCat['nourriture'] + $achatsCat['boissons'] + $sal['brut']), 'Matières + salaires / CA', 65, 'bi-speedometer'],
+];
 
 // ---- Graphique 1 : CA par jour (ou par mois si période longue) ----
 $long = (strtotime($au) - strtotime($du)) > 62 * 86400;
@@ -125,13 +141,32 @@ require __DIR__ . '/inc/header.php';
 
 <div class="row g-3 mb-3 mt-1">
     <?= kpi("Chiffre d'affaires", $caTotal, '#6f42c1', 'bi-graph-up-arrow',
-        'Espèces ' . money($ca['esp']) . '<br>Carte ' . money($ca['cb']), 'ventes.php') ?>
+        'Espèces ' . money($ca['esp']) . '<br>Carte ' . money($ca['cb'])
+        . '<br>' . number_format((int) $ca['couv'], 0, ',', ' ') . ' couverts · ticket moyen ' . money($ticketMoyen), 'ventes.php') ?>
     <?= kpi('Achats fournisseurs', $achats, '#0d6efd', 'bi-cart3',
-        'Payé ' . money($paiements) . '<br>Dette totale <span class="text-danger">' . money($detteFour) . '</span>', 'achats.php') ?>
+        'Nourriture ' . money($achatsCat['nourriture']) . '<br>Boissons ' . money($achatsCat['boissons'])
+        . '<br>Payé ' . money($paiements) . ' · dette <span class="text-danger">' . money($detteFour) . '</span>', 'achats.php') ?>
     <?= kpi('Salaires', $sal['brut'], '#fd7e14', 'bi-people',
         'Net payé ' . money($sal['net']) . ' (' . (int) $sal['nb'] . ')<br>Avances versées ' . money($avances), 'salaires.php') ?>
     <?= kpi('Charges', $charges, '#dc3545', 'bi-receipt',
         'Fixes ' . money($ch['fixe']) . '<br>Variables ' . money($ch['variable']), 'charges.php') ?>
+</div>
+
+<div class="row g-3 mb-3">
+    <?php foreach ($ratios as [$label, $val, $aide, $seuil, $icon]):
+        $etat = $val === null ? 'secondary' : ($val <= $seuil ? 'success' : ($val <= $seuil + 5 ? 'warning' : 'danger')); ?>
+        <div class="col-6 col-xl-3">
+            <div class="card p-3 h-100">
+                <div class="d-flex justify-content-between">
+                    <div class="kpi-label small text-uppercase text-muted"><?= e($label) ?></div>
+                    <i class="bi <?= $icon ?> text-<?= $etat ?>"></i>
+                </div>
+                <div class="fs-4 fw-semibold text-<?= $etat ?>"><?= $val === null ? '—' : number_format($val, 1, ',', ' ') . ' %' ?></div>
+                <div class="progress my-1" style="height:6px"><div class="progress-bar bg-<?= $etat ?>" style="width:<?= min(100, (float) $val) ?>%"></div></div>
+                <div class="small text-muted"><?= e($aide) ?> · objectif ≤ <?= $seuil ?> %</div>
+            </div>
+        </div>
+    <?php endforeach; ?>
 </div>
 
 <div class="row g-3 mb-3">
@@ -210,7 +245,9 @@ require __DIR__ . '/inc/header.php';
 <?php
 $data = json_encode([
     'labels1' => $labels1, 'esp' => $esp1, 'cb' => $cb1,
-    'dep' => [round($achats, 2), round($sal['brut'], 2), round($ch['fixe'], 2), round($ch['variable'], 2)],
+    'dep' => [round($achatsCat['nourriture'], 2), round($achatsCat['boissons'], 2),
+              round($achatsCat['consommables'] + $achatsCat['autre'], 2),
+              round($sal['brut'], 2), round($ch['fixe'], 2), round($ch['variable'], 2)],
     'c2' => $chart2,
 ], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG);
 $scripts = <<<JS
@@ -237,8 +274,8 @@ new Chart(document.getElementById('chart12'), {
 const dep = document.getElementById('chartDep');
 if (dep) new Chart(dep, {
     type: 'doughnut',
-    data: {labels: ['Achats', 'Salaires', 'Charges fixes', 'Charges variables'],
-        datasets: [{data: D.dep, backgroundColor: ['#0d6efd', '#fd7e14', '#0dcaf0', '#6c757d']}]},
+    data: {labels: ['Nourriture', 'Boissons', 'Autres achats', 'Salaires', 'Charges fixes', 'Charges variables'],
+        datasets: [{data: D.dep, backgroundColor: ['#198754', '#0d6efd', '#adb5bd', '#fd7e14', '#0dcaf0', '#6c757d']}]},
     options: {maintainAspectRatio: false, plugins: {legend: {position: 'bottom'},
         tooltip: {callbacks: {label: c => ' ' + c.label + ' : ' + fmt(c.parsed)}}}}
 });

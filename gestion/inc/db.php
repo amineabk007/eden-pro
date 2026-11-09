@@ -17,7 +17,8 @@ function gestion_install(PDO $pdo): void
 {
     try {
         $pdo->query('SELECT 1 FROM g_charges LIMIT 1');
-        return; // déjà installé
+        gestion_migrate($pdo); // déjà installé : mise à jour éventuelle
+        return;
     } catch (PDOException $e) {
         // tables absentes : on les crée
     }
@@ -34,6 +35,7 @@ function gestion_install(PDO $pdo): void
             date_vente DATE NOT NULL,
             montant_especes DECIMAL(12,2) NOT NULL DEFAULT 0,
             montant_carte DECIMAL(12,2) NOT NULL DEFAULT 0,
+            nb_couverts INT NOT NULL DEFAULT 0,
             note VARCHAR(255) NULL,
             $now
         )$end",
@@ -50,6 +52,7 @@ function gestion_install(PDO $pdo): void
             fournisseur_id $fk NOT NULL,
             date_achat DATE NOT NULL,
             num_facture VARCHAR(100) NULL,
+            categorie VARCHAR(20) NOT NULL DEFAULT 'nourriture',
             montant DECIMAL(12,2) NOT NULL,
             note VARCHAR(255) NULL,
             $now,
@@ -122,16 +125,36 @@ function gestion_install(PDO $pdo): void
         $pdo->exec($q);
     }
 
-    // Catégories de charges par défaut
+    // Catégories de charges par défaut (restaurant)
     $defaults = [
         ['Loyer', 'fixe'], ['Assurance', 'fixe'], ['Internet / Téléphone', 'fixe'],
-        ['Abonnements & logiciels', 'fixe'], ['Électricité', 'variable'], ['Eau', 'variable'],
-        ['Gaz', 'variable'], ['Entretien & réparations', 'variable'], ['Transport / Carburant', 'variable'],
-        ['Fournitures', 'variable'], ['Impôts & taxes', 'variable'], ['Divers', 'variable'],
+        ['Abonnements (caisse, logiciels, TV…)', 'fixe'], ['Location terminal TPE', 'fixe'],
+        ['Comptable', 'fixe'], ['Licence / autorisations', 'fixe'],
+        ['Électricité', 'variable'], ['Eau', 'variable'], ['Gaz (bouteilles)', 'variable'],
+        ['Produits d\'entretien & hygiène', 'variable'], ['Linge & blanchisserie', 'variable'],
+        ['Entretien & réparations', 'variable'], ['Commissions carte bancaire', 'variable'],
+        ['Animation / DJ / musique', 'variable'], ['Marketing & réseaux sociaux', 'variable'],
+        ['Transport / livraison', 'variable'], ['Impôts & taxes', 'variable'], ['Divers', 'variable'],
     ];
     $st = $pdo->prepare('INSERT INTO g_categories_charges (nom, type) VALUES (?, ?)');
     foreach ($defaults as $d) {
         $st->execute($d);
+    }
+}
+
+/** Ajoute les colonnes apparues dans les versions récentes (installations existantes). */
+function gestion_migrate(PDO $pdo): void
+{
+    $cols = [
+        'g_ventes' => ['nb_couverts', 'INT NOT NULL DEFAULT 0'],
+        'g_achats' => ['categorie', "VARCHAR(20) NOT NULL DEFAULT 'nourriture'"],
+    ];
+    foreach ($cols as $table => [$col, $def]) {
+        try {
+            $pdo->query("SELECT $col FROM $table LIMIT 1");
+        } catch (PDOException $e) {
+            $pdo->exec("ALTER TABLE $table ADD COLUMN $col $def");
+        }
     }
 }
 

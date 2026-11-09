@@ -1,7 +1,16 @@
 <?php
 // gestion/inc/functions.php — fonctions utilitaires.
 
+const APP_NAME = 'Dune Rooftop';
 const DEVISE = 'DH';
+
+// Familles d'achats (pour le food cost / coût boissons)
+const CATEGORIES_ACHAT = [
+    'nourriture'   => 'Nourriture',
+    'boissons'     => 'Boissons',
+    'consommables' => 'Consommables & emballages',
+    'autre'        => 'Autre',
+];
 
 const MODES_PAIEMENT = [
     'especes'  => 'Espèces',
@@ -20,7 +29,8 @@ function e($s): string
 
 function money($n): string
 {
-    return number_format((float) $n, 2, ',', ' ') . ' ' . DEVISE;
+    // espaces insécables : un montant n'est jamais coupé en fin de ligne
+    return number_format((float) $n, 2, ',', "\u{00A0}") . "\u{00A0}" . DEVISE;
 }
 
 function fdate(?string $d): string

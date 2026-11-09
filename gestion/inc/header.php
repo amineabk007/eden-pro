@@ -21,7 +21,7 @@ $menu = [
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= e($title ?? 'Gestion') ?> — Eden Gestion</title>
+    <title><?= e($title ?? 'Gestion') ?> — <?= APP_NAME ?></title>
     <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
     <link rel="stylesheet" href="assets/vendor/bootstrap-icons.min.css">
     <link rel="stylesheet" href="assets/style.css">
@@ -31,18 +31,18 @@ $menu = [
     <button class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-label="Menu">
         <i class="bi bi-list"></i>
     </button>
-    <span class="navbar-brand mb-0 h1">Eden Gestion</span>
+    <span class="navbar-brand mb-0 h1"><i class="bi bi-sunset"></i> <?= APP_NAME ?></span>
 </nav>
 
 <div class="d-flex">
     <aside class="sidebar offcanvas-lg offcanvas-start text-bg-dark" tabindex="-1" id="sidebar">
         <div class="offcanvas-header d-lg-none">
-            <h5 class="offcanvas-title">Eden Gestion</h5>
+            <h5 class="offcanvas-title"><?= APP_NAME ?></h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"></button>
         </div>
         <div class="offcanvas-body d-flex flex-column p-3">
             <a href="index.php" class="brand d-none d-lg-flex align-items-center mb-3 text-white text-decoration-none">
-                <i class="bi bi-shop fs-4 me-2"></i><span class="fs-5 fw-semibold">Eden Gestion</span>
+                <i class="bi bi-sunset fs-3 me-2 text-warning"></i><span><span class="d-block fs-5 fw-semibold lh-1"><?= APP_NAME ?></span><small class="text-white-50">Gestion du restaurant</small></span>
             </a>
             <ul class="nav nav-pills flex-column mb-auto">
                 <?php foreach ($menu as $key => $item): ?>

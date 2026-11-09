@@ -1,4 +1,4 @@
--- Module Gestion — schéma MySQL (base `eden`).
+-- Dune Rooftop — module Gestion du restaurant — schéma MySQL (base `eden`).
 -- Facultatif : les tables sont aussi créées automatiquement au premier accès à /gestion/.
 
 CREATE TABLE IF NOT EXISTS g_ventes (
@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS g_ventes (
     date_vente DATE NOT NULL,
     montant_especes DECIMAL(12,2) NOT NULL DEFAULT 0,
     montant_carte DECIMAL(12,2) NOT NULL DEFAULT 0,
+    nb_couverts INT NOT NULL DEFAULT 0,
     note VARCHAR(255) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -24,6 +25,7 @@ CREATE TABLE IF NOT EXISTS g_achats (
     fournisseur_id INT NOT NULL,
     date_achat DATE NOT NULL,
     num_facture VARCHAR(100) NULL,
+    categorie VARCHAR(20) NOT NULL DEFAULT 'nourriture',   -- nourriture, boissons, consommables, autre
     montant DECIMAL(12,2) NOT NULL,
     note VARCHAR(255) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -99,6 +101,9 @@ CREATE TABLE IF NOT EXISTS g_charges (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO g_categories_charges (nom, type) VALUES
-('Loyer','fixe'), ('Assurance','fixe'), ('Internet / Téléphone','fixe'), ('Abonnements & logiciels','fixe'),
-('Électricité','variable'), ('Eau','variable'), ('Gaz','variable'), ('Entretien & réparations','variable'),
-('Transport / Carburant','variable'), ('Fournitures','variable'), ('Impôts & taxes','variable'), ('Divers','variable');
+('Loyer','fixe'), ('Assurance','fixe'), ('Internet / Téléphone','fixe'), ('Abonnements (caisse, logiciels, TV…)','fixe'),
+('Location terminal TPE','fixe'), ('Comptable','fixe'), ('Licence / autorisations','fixe'),
+('Électricité','variable'), ('Eau','variable'), ('Gaz (bouteilles)','variable'), ('Produits d''entretien & hygiène','variable'),
+('Linge & blanchisserie','variable'), ('Entretien & réparations','variable'), ('Commissions carte bancaire','variable'),
+('Animation / DJ / musique','variable'), ('Marketing & réseaux sociaux','variable'), ('Transport / livraison','variable'),
+('Impôts & taxes','variable'), ('Divers','variable');
